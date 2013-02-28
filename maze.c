@@ -122,6 +122,7 @@ void addLWall(Cell maze[][16], int x, int y, int dir)
 	}
 }
 
+#ifdef TEST
 /* Test functions */
 void generateBinary(Cell maze[][16])
 {
@@ -246,3 +247,4 @@ void showDirection(int dir)
 	return!(openNorth(maze,x,y)||openEast(maze,x,y)||openSouth(maze,x,y)
 			||openWest(maze,x,y));
 }*/
+#endif
