@@ -5,7 +5,7 @@
 #include "cell.h"
 #include "queue.h"
 
-void update(Cell maze[][16], int mx, int my, int dir, Cell testMaze[][16]);
+void update(Cell maze[][16], int mx, int my, int dir);
 
 void flood(Cell maze[][16], Queue *q, int n);
 
@@ -42,11 +42,5 @@ int closer(Cell *current, Cell *target);
 int inCenter(int mx, int my);
 
 int inStart(int mx, int my);
-
-int seeFWall(int mx, int my, int dir, Cell testMaze[][16]);
-
-int seeRWall(int mx, int my, int dir, Cell testMaze[][16]);
-
-int seeLWall(int mx, int my, int dir, Cell testMaze[][16]);
 
 #endif

@@ -89,19 +89,4 @@ void addWall(Cell *c, int w)
 void setDist(Cell *c, int d)
 {
 	c->dist = d;
-}	
-/* Other */
-/*
-int xy2loc(int x, int y)
-{
-	return (16*(y)+x);
 }
-int locx(int l)
-{
-	return l%16;
-}
-int locy(int l)
-{
-	return l/16;
-}
-*/
