@@ -10,28 +10,33 @@
 
 
 //emitter macros
-#define FRE LATBbits.LATB7
-#define SRE LATBbits.LATB8
-#define SLE LATBbits.LATB9
-#define FLE LATBbits.LATB13
+#define FRE LATAbits.LATA8 //LATBbits.LATB7
+#define SRE LATBbits.LATB4 //LATBbits.LATB8
+#define SLE LATAbits.LATA9 //LATBbits.LATB9
+#define FLE LATAbits.LATA4 //LATBbits.LATB13
 
 //detectors
-#define FLD 0
-#define SLD 1
-#define FRD 2
-#define SRD 3
+#define FLD 6
+#define SLD 7
+#define FRD 4
+#define SRD 5
 
 //ideal values
-#define RIDEAL 230
-#define LIDEAL 280
-#define FLIDEAL 540
-#define FRIDEAL 600
-#define FLMIN 200       //UPDATE THESE FOR MID-CELL MAPPING
-#define FRMIN 230
+#define RIDEAL 290
+#define LIDEAL 240
+#define FLIDEAL 500
+#define FRIDEAL 500
+#define FMIN 50
+#define FLMIN 50
+#define FRMIN 50
 
-#define RIGHTWALL (sr > 160)
-#define LEFTWALL (sl > 190)
-#define FRONTWALL ((fl > FLMIN)||(fr > FRMIN))
+#define RIGHTWALL (sr > 100)
+#define LEFTWALL (sl > 70)
+
+#define RIGHTWALL_T (sr > RIDEAL)
+#define LEFTWALL_T (sl > LIDEAL)
+
+#define FRONTWALL ((fl+fr)/2 > FMIN)
 #define FRONTSTOP ((fl > FLIDEAL)||(fr > FRIDEAL))
 
 void initADC();

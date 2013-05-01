@@ -16,7 +16,6 @@
 /* Initialization */
 void m_init(Cell maze[][16]);
 /* Utilities */
-int xyWalls(Cell maze[][16], int x, int y);	/* Gets walls of cell (x,y) */
 int isValid(int x, int y);	/* Checks if (x,y) is within the maze */
 int openNorth(Cell maze[][16], int x, int y);
 int openEast(Cell maze[][16], int x, int y);

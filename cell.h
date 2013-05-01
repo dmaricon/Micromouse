@@ -6,19 +6,19 @@
 #ifndef CELL_H
 #define CELL_H
 
+typedef struct {
+	int walls; //presence(?) of north and east walls
+	int dist; //distance from destination cell
+	int x,y; //cell location
+	int checked; //flag used for solving algorithm
+	int visited; //possible flag for maze exploration
+} Cell;
+
+//values for "walls" field
 #define NONE 0
 #define N 1
 #define E 2
 #define NE 3
-
-typedef struct {
-	int walls;
-	int dist;
-	int x;
-	int y;
-	int checked;
-	int visited;
-} Cell;
 
 /* Initialization */
 void c_init(Cell *c, int w, int cx, int cy);
@@ -33,17 +33,12 @@ int getx(Cell *c);
 int gety(Cell *c);
 int hasEast(Cell *c);
 int hasNorth(Cell *c);
-int c_checked(Cell *c);
+int checked(Cell *c);
 int visited(Cell *c);
 /* Modification */
 void setWalls(Cell *c, int w);
 void addWall(Cell *c, int w);
 void setDist(Cell *c, int d);
-/* Other */
-/*
-int xy2loc(int x, int y);
-int locx(int l);
-int locy(int l);
-*/
+void visit(Cell* c);
 
 #endif

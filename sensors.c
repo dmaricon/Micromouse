@@ -1,77 +1,91 @@
 #include "sensors.h"
-#include "p33FJ128MC802.h"
+#include "p33FJ128MC804.h"
 #include "libpic30.h"
 #include "delay.h"
 #include "clock.h"
-#define KERROR 5
-
-//#define KTRACKING
+#include "led.h"
 
 int noise;
 extern double tsr, tsl, tsr0, tsl0;
 extern int fl,sl,fr,sr;
+extern int rDispTotal,lDispTotal;
 int rightWall = 0;
 int leftWall = 0;
 int frontWall = 0;
+int srError,slError;
+int srErrorPrev,slErrorPrev;
 
 //tracking gains
-#define kP_TRACKING 0.002
-#define kD_TRACKING
-#define kI_TRACKING
+#define kP_TRACKING 0.003
+#define kD_TRACKING 0.002
+
+#define SRERROR_DIFF (double)(srError-srErrorPrev)
+#define SLERROR_DIFF (double)(slError-slErrorPrev)
 
 void track()
 {
-    int srError,slError;
+    double correction;
 
-    if(RIGHTWALL)
-    {
-#ifndef KTRACKING
-        srError = RIDEAL - sr;
-        tsr = tsr0*(1.0-kP_TRACKING*(double)srError);
-        tsl = tsl0*(1.0+kP_TRACKING*(double)srError);
-#else
-        if(sr < RIDEAL - KERROR) //left of center
-            tsr = tsr0 - tsr0 * 0.1;
-        else if(sr > RIDEAL + KERROR) //right of center
-            tsl = tsl0 - tsl0 * 0.1;
-        else{
-            tsr = tsr0;
-            tsl = tsl0;
-        }
-#endif
-    }
-    else if(LEFTWALL)
-    {
-#ifndef KTRACKING
+    sl = sensorRead(SLD);
+    if(LEFTWALL_T){
+        srErrorPrev = srError = 0;
+        slErrorPrev = slError;
         slError = LIDEAL - sl;
-        tsr = tsr0*(1.0+kP_TRACKING*(double)slError);
-        tsl = tsl0*(1.0-kP_TRACKING*(double)slError);
-#else
-        if(sl < LIDEAL - KERROR) //right of center
-            tsl = tsr0 - tsr0 * 0.1;
-        else if(sl > LIDEAL + KERROR) //left of center
-            tsr = tsl0 - tsl0 * 0.1;
-        else{
-            tsr = tsr0;
-            tsl = tsl0;
-        }
-#endif
+        if(slErrorPrev > 0)
+            correction = kP_TRACKING*slError + kD_TRACKING*SLERROR_DIFF;
+        else
+            correction = kP_TRACKING*slError;
+
+        tsr = tsr0*(1.0+correction);
+        tsl = tsl0*(1.0-correction);
+        return;
     }
-    else{
-        tsr = tsr0;
-        tsl = tsl0;
+
+    sr = sensorRead(SRD);
+    if(RIGHTWALL_T){
+        slErrorPrev = slError = 0;
+        srErrorPrev = srError;
+        srError = RIDEAL - sr;
+
+        if(srErrorPrev > 0)
+            correction = kP_TRACKING*(double)srError + kD_TRACKING*(double)SRERROR_DIFF;
+        else
+            correction = kP_TRACKING*(double)srError;
+
+        tsr = tsr0*(1.0-correction);
+        tsl = tsl0*(1.0+correction);
+        return;
     }
+
+    tsr = tsr0;
+    tsl = tsl0;
+    slError = srError = srErrorPrev = slErrorPrev = 0;
 }
 void mapWalls()
 {
+    fl = sensorRead(FLD);
+    fr = sensorRead(FRD);
+    sl = sensorRead(SLD);
+    sr = sensorRead(SRD);
     rightWall = RIGHTWALL;
     leftWall = LEFTWALL;
     frontWall = FRONTWALL;
+    RED = leftWall;
+    BLUE = frontWall;
+    GREEN = rightWall;
 }
 int sensorRead(int sensor)
 {
+    int noise;
     choose_sensor(sensor); //choose sensor
-                            //optional noise read here
+
+    //noise reading
+    AD1CON1bits.SAMP = 1; //Begin sample
+    __delay_us(10);
+    AD1CON1bits.SAMP = 0; //Stop sample
+    while(!AD1CON1bits.DONE); //wait for conversion
+    noise = ADC1BUF0; //read buffer
+
     emitterOn(sensor);
     __delay_us(5);
     AD1CON1bits.SAMP = 1; //Begin sample
@@ -79,7 +93,7 @@ int sensorRead(int sensor)
     AD1CON1bits.SAMP = 0; //Stop sample
     emitterOff(sensor);
     while(!AD1CON1bits.DONE); //wait for conversion
-    return ADC1BUF0; //read buffer
+    return ADC1BUF0-noise; //read buffer
 }
 void emitterOn(int sensor)
 {
@@ -121,8 +135,16 @@ void choose_sensor(int sensor)
 }
 void sensorStart()
 {
-    while(!FRONTSTOP);
+    ledYellow();
+    fl = sensorRead(FLD);
+    fr = sensorRead(FRD);
+    while(!FRONTSTOP){
+        fl = sensorRead(FLD);
+        fr = sensorRead(FRD);
+    }
+    ledGreen();
     delayms(1000);
+    rDispTotal = lDispTotal = 0;
 }
 void initADC()
 {	

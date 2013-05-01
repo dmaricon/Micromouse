@@ -18,10 +18,6 @@ void m_init(Cell maze[][16])
 }
 
 /* Utilities */
-int xyWalls(Cell maze[][16], int x, int y)
-{
-	return getWalls(&maze[x][y]);
-}
 int isValid(int x, int y)
 {
 	return(x>=0 && x<16 && y>=0 && y<16);

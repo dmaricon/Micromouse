@@ -11,7 +11,7 @@
 #define QSIZE 256
 
 typedef struct {
-	Cell *contents[QSIZE];
+	Cell* contents[QSIZE];
 	int front;
 	int count;
 } Queue;

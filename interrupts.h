@@ -13,5 +13,8 @@
 void enable_T1(void);
 void enable_T2(void);
 
+void init_Button();
+void buttonStart();
+
 #endif	/* INTERRUPTS_H */
 

@@ -1,12 +1,12 @@
 #include "QEI.h"
-#include "p33FJ128MC802.h"
+#include "p33FJ128MC804.h"
 
 #define QEI_TO_DEGREE (360.0/16760) //value from testing
-#define DEGREE_TO_CM .006021385919 // = Displacement(cm) / AngDisplacement
+#define DEGREE_TO_CM .0050637513 // = Displacement(cm) / AngDisplacement
 
 #define QEI_FREQ 1000 //timer2 interrupt freq (Hz)
 
-#define ERROR_ADJUSTMENT (100.0/96) //observed approx. -4% error in distance calc
+#define ERROR_ADJUSTMENT (101.5/100.0) //observed error adjustment
 
 #define MAX_CNT_PER_REV (512*2-1)
 #define MAXSPEED (double)(((unsigned long)MAX_CNT_PER_REV*2048/125)*QEI_TO_DEGREE)
@@ -16,7 +16,6 @@ double rVelocity = 0;
 double lVelocity = 0;
 double read_velocity1[256];
 double read_velocity2[256];
-int i;
 double rAngPos[2] = {0,0};
 double lAngPos[2] = {0,0};
 double rDispTotal = 0;
@@ -61,10 +60,6 @@ void rVelocityCalc()
     rVelocity *= DEGREE_TO_CM * ERROR_ADJUSTMENT;
     rDispTotal += rVelocity;
     rVelocity *= QEI_FREQ;
-    if(i<256 && rVelocity != 0){
-        read_velocity1[i]=rVelocity;
-        i++;
-    }
 }
 void lVelocityCalc()
 {
@@ -84,11 +79,6 @@ void lVelocityCalc()
     lVelocity *= DEGREE_TO_CM * ERROR_ADJUSTMENT;
     lDispTotal += lVelocity;
     lVelocity *= QEI_FREQ;
-
-//    if(i<256 && lVelocity != 0){
-//        read_velocity2[i]=lVelocity;
-//        i++;
-//    }
 }
 
 void init_QEI(void)
@@ -112,10 +102,10 @@ void init_QEI(void)
     QEI1CONbits.POSRES = 0;         // No index pulse reset
     QEI2CONbits.POSRES = 0;
 
-    QEI1CONbits.QEIM = 0b101;           // Use 2x Update mode with reset on MAXxCNT match (QEIM <2:0>)
+    QEI1CONbits.QEIM = 0b101;       // Use 2x Update mode with reset on MAXxCNT match (QEIM <2:0>)
     QEI2CONbits.QEIM = 0b101;
 
-    QEI1CONbits.PCDOUT = 0;         // Counter Direction of Status Output (Normal I/O pin operation)
+    QEI1CONbits.PCDOUT = 0;        // Counter Direction of Status Output (Normal I/O pin operation)
     QEI2CONbits.PCDOUT = 0;
 
     DFLT1CONbits.CEID = 1;          // Interrupts for count errors are disabled

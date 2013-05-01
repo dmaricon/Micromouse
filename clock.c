@@ -1,5 +1,5 @@
 #include "clock.h"
-#include "p33FJ128MC802.h"
+#include "p33FJ128MC804.h"
 
 void init_OSC(void)
 {
